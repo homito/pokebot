@@ -1,0 +1,9 @@
+{
+    "token": "",
+    "prefix": "!",
+    "log_config":{
+      "log_level":"DEBUG",
+      "log_format":"%(asctime)s - %(message)s",
+      "log_file":"logs/testlog.txt"
+    }
+}
