@@ -1,5 +1,6 @@
 import logging
 import json
+import requests
 from argparse import ArgumentParser
 import discord
 from discord import Client
@@ -51,6 +52,16 @@ class MyBot(Client):
 
         if message.content == config["prefix"] + "ping":
             await message.channel.send("Pong!")
+
+        if message.content.startswith(config["prefix"] + "dex"):
+            url = "https://play.pokemonshowdown.com/data/pokedex.json"
+            search = message.content.split(" ")[1]
+            response = requests.get(url)
+            data = response.json()
+            try:
+                await message.channel.send(str(data.get(search).get("num")) + " " + data.get(search).get("name"))
+            except AttributeError:
+                await message.channel.send("Pokemon not found")
 
         if message.content == config["prefix"] + "help":
             await message.channel.send("Hello! I am a bot. I can respond to the following commands:\n\n" +
