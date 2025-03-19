@@ -65,7 +65,11 @@ class MyBot(Client):
                     color=discord.Color.blue()
                 )
                 embed.set_thumbnail(url=f"https://play.pokemonshowdown.com/sprites/gen5/{search}.png")
-                embed.set_image(url=f"https://play.pokemonshowdown.com/sprites/xyani/{search}.gif") # some recent gens pokemon have no gif
+                res = requests.get(f"https://play.pokemonshowdown.com/sprites/xyani/{search}.gif")
+                if res.status_code == requests.codes.NOT_FOUND:
+                    embed.set_image(url=f"https://play.pokemonshowdown.com/sprites/bwani/{search}.gif")
+                else:
+                    embed.set_image(url=f"https://play.pokemonshowdown.com/sprites/xyani/{search}.gif")
                 await message.channel.send(embed=embed)
             except AttributeError:
                 await message.channel.send("Pokemon not found")
