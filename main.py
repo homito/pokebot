@@ -66,7 +66,7 @@ class MyBot(Client):
         if message.content == config["prefix"] + "help":
             await message.channel.send("Hello! I am a bot. I can respond to the following commands:\n\n" +
                 "ping - I will respond with 'Pong!'\n" +
-                "prompt <message> - I will respond with a message generated using GPT-3"
+                "dex <pokemon> - I will respond with the National Dex number of the Pokemon you provide"
             )
 
 
