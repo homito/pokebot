@@ -59,7 +59,14 @@ class MyBot(Client):
             response = requests.get(url)
             data = response.json()
             try:
-                await message.channel.send(str(data.get(search).get("num")) + " " + data.get(search).get("name"))
+                embed = discord.Embed(
+                    title=search.capitalize(),
+                    description=f"National Dex number: {data.get(search).get('num')}",
+                    color=discord.Color.blue()
+                )
+                embed.set_thumbnail(url=f"https://play.pokemonshowdown.com/sprites/gen5/{search}.png")
+                embed.set_image(url=f"https://play.pokemonshowdown.com/sprites/xyani/{search}.gif") # some recent gens pokemon have no gif
+                await message.channel.send(embed=embed)
             except AttributeError:
                 await message.channel.send("Pokemon not found")
 
