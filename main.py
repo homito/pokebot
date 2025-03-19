@@ -5,6 +5,8 @@ from argparse import ArgumentParser
 import discord
 from discord import Client
 
+URL_SPRITE = "https://play.pokemonshowdown.com/sprites"
+
 class Logger:
 
     def __init__(self, config:dict):
@@ -56,7 +58,7 @@ class MyBot(Client):
         if message.content.startswith(config["prefix"] + "dex"):
             url = "https://play.pokemonshowdown.com/data/pokedex.json"
             search = message.content.split(" ")[1]
-            response = requests.get(url)
+            response = requests.get(url, timeout=10)
             data = response.json()
             try:
                 embed = discord.Embed(
@@ -64,12 +66,12 @@ class MyBot(Client):
                     description=f"National Dex number: {data.get(search).get('num')}",
                     color=discord.Color.blue()
                 )
-                embed.set_thumbnail(url=f"https://play.pokemonshowdown.com/sprites/gen5/{search}.png")
-                res = requests.get(f"https://play.pokemonshowdown.com/sprites/xyani/{search}.gif")
+                embed.set_thumbnail(url=f"{URL_SPRITE}/gen5/{search}.png")
+                res = requests.get(f"{URL_SPRITE}/xyani/{search}.gif", timeout=10)
                 if res.status_code == requests.codes.NOT_FOUND:
-                    embed.set_image(url=f"https://play.pokemonshowdown.com/sprites/bwani/{search}.gif")
+                    embed.set_image(url=f"{URL_SPRITE}/bwani/{search}.gif")
                 else:
-                    embed.set_image(url=f"https://play.pokemonshowdown.com/sprites/xyani/{search}.gif")
+                    embed.set_image(url=f"{URL_SPRITE}/xyani/{search}.gif")
                 await message.channel.send(embed=embed)
             except AttributeError:
                 await message.channel.send("Pokemon not found")
@@ -79,7 +81,6 @@ class MyBot(Client):
                 "ping - I will respond with 'Pong!'\n" +
                 "dex <pokemon> - I will respond with the National Dex number of the Pokemon you provide"
             )
-
 
 if __name__ == "__main__":
     parser = ArgumentParser()
