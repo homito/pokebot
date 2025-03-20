@@ -9,7 +9,9 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "discord (>=2.3.2,<3.0.0)",
-    "requests (>=2.32.3,<3.0.0)"
+    "requests (>=2.32.3,<3.0.0)",
+    "websockets (>=15.0.1,<16.0.0)",
+    "beautifulsoup4 (>=4.13.3,<5.0.0)"
 ]
 
 

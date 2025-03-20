@@ -2,16 +2,32 @@ import logging
 import json
 import requests
 from argparse import ArgumentParser
+from websockets.sync.client import connect
 import discord
 from discord.ext import commands
+from bs4 import BeautifulSoup
 
 URL_POKEDEX = "https://play.pokemonshowdown.com/data/pokedex.json"
 URL_SPRITE = "https://play.pokemonshowdown.com/sprites"
+WEBSOCKET = "wss://sim3.psim.us/showdown/websocket"
 
 intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+
+def request_pokemon_search(searched: str):
+    with connect(WEBSOCKET) as websocket:
+        websocket.recv() # ignore |updateuser| message
+        websocket.recv() # ignore |challstr| message (i should probably check what they are so its not hacked like that)
+        websocket.send(f"|/dt {searched}")
+        message = websocket.recv()
+        return message
+def parse_pokemon_search(message: str):
+    m = [w for w in message.split("|pm|") if "pokemonnamecol" in w]
+    html = m[0].split("/raw ")[1] # if websocket sends error, this will beak as there is nothing to split
+    soup = BeautifulSoup(html, features="html.parser")
+    return soup.a.string
 
 @bot.event
 async def on_ready():
@@ -24,7 +40,7 @@ async def foo(ctx, arg):
 
 @bot.command()
 async def dex(ctx, arg):
-    search = arg.split(" ")[0]
+    search = parse_pokemon_search(request_pokemon_search(arg)).lower()
     response = requests.get(URL_POKEDEX, timeout=10)
     data = response.json()
     try:
