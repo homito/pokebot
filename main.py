@@ -8,6 +8,7 @@ from discord.ext import commands
 from bs4 import BeautifulSoup
 
 URL_POKEDEX = "https://play.pokemonshowdown.com/data/pokedex.json"
+URL_POKEDEX_ICON = "https://archives.bulbagarden.net/media/upload/thumb/6/61/DP_Pok%C3%A9dex.png/726px-DP_Pok%C3%A9dex.png"
 URL_SPRITE = "https://play.pokemonshowdown.com/sprites"
 WEBSOCKET = "wss://sim3.psim.us/showdown/websocket"
 
@@ -45,10 +46,10 @@ async def dex(ctx, arg):
     data = response.json()
     try:
         embed = discord.Embed(
-            title=search.capitalize(),
-            description=f"National Dex number: {data.get(search).get('num')}",
+            title=f"{data.get(search).get('num')}. {search.capitalize()}",
             color=discord.Color.blue()
         )
+        embed.set_author(name="Pokedex", icon_url=URL_POKEDEX_ICON)
         embed.set_thumbnail(url=f"{URL_SPRITE}/gen5/{search}.png")
         res = requests.get(f"{URL_SPRITE}/xyani/{search}.gif", timeout=10)
         if res.status_code == requests.codes.NOT_FOUND:
