@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 import discord
 from discord import Client
 
+URL_POKEDEX = "https://play.pokemonshowdown.com/data/pokedex.json"
 URL_SPRITE = "https://play.pokemonshowdown.com/sprites"
 
 class Logger:
@@ -58,7 +59,7 @@ class MyBot(Client):
         if message.content.startswith(config["prefix"] + "dex"):
             url = "https://play.pokemonshowdown.com/data/pokedex.json"
             search = message.content.split(" ")[1]
-            response = requests.get(url, timeout=10)
+            response = requests.get(URL_POKEDEX, timeout=10)
             data = response.json()
             try:
                 embed = discord.Embed(
