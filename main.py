@@ -29,6 +29,8 @@ def parse_pokemon_search(message: str):
     html = m[0].split("/raw ")[1] # if websocket sends error, this will beak as there is nothing to split
     soup = BeautifulSoup(html, features="html.parser")
     return soup.a.string
+def pokemon_type(message: str) -> str:
+    return "```ansi\n\x1B[2;41m Feu \x1B[0m \x1B[2;45m Vol \x1B[0m```" #TODO: not placeholder
 
 @bot.event
 async def on_ready():
@@ -47,15 +49,15 @@ async def dex(ctx, arg):
     try:
         embed = discord.Embed(
             title=f"{data.get(search).get('num')}. {search.capitalize()}",
+            description= pokemon_type(search),
             color=discord.Color.blue()
         )
         embed.set_author(name="Pokedex", icon_url=URL_POKEDEX_ICON)
-        embed.set_thumbnail(url=f"{URL_SPRITE}/gen5/{search}.png")
         res = requests.get(f"{URL_SPRITE}/xyani/{search}.gif", timeout=10)
         if res.status_code == requests.codes.NOT_FOUND:
-            embed.set_image(url=f"{URL_SPRITE}/bwani/{search}.gif")
+            embed.set_thumbnail(url=f"{URL_SPRITE}/bwani/{search}.gif")
         else:
-            embed.set_image(url=f"{URL_SPRITE}/xyani/{search}.gif")
+            embed.set_thumbnail(url=f"{URL_SPRITE}/xyani/{search}.gif")
         await ctx.send(embed=embed)
     except AttributeError:
         await ctx.send("Pokemon not found")
