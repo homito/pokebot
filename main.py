@@ -29,8 +29,22 @@ def parse_pokemon_search(message: str):
     html = m[0].split("/raw ")[1] # if websocket sends error, this will beak as there is nothing to split
     soup = BeautifulSoup(html, features="html.parser")
     return soup.a.string
+def parse_pokemon_type(message: str):
+    m = [w for w in message.split("|pm|") if "pokemonnamecol" in w]
+    html = m[0].split("/raw ")[1] # if websocket sends error, this will beak as there is nothing to split
+    soup = BeautifulSoup(html, features="html.parser")
+    return soup.a.string
 def pokemon_type(message: str) -> str:
-    return "```ansi\n\x1B[2;41m Feu \x1B[0m \x1B[2;45m Vol \x1B[0m```" #TODO: not placeholder
+    m = [w for w in message.split("|pm|") if "pokemonnamecol" in w]
+    html = m[0].split("/raw ")[1] # if websocket sends error, this will beak as there is nothing to split
+    soup = BeautifulSoup(html, features="html.parser")
+    img = soup.find_all('img')
+    res = "```ansi\n"
+    for i in img:
+        res += f"\x1B[2;45m {i['alt']} \x1B[0m"
+    res += "```"
+    return res
+    #return "```ansi\n\x1B[2;41m Feu \x1B[0m \x1B[2;45m Vol \x1B[0m```" #TODO: not placeholder
 
 @bot.event
 async def on_ready():
@@ -49,7 +63,7 @@ async def dex(ctx, arg):
     try:
         embed = discord.Embed(
             title=f"{data.get(search).get('num')}. {search.capitalize()}",
-            description= pokemon_type(search),
+            description= pokemon_type(request_pokemon_search(arg)),
             color=discord.Color.blue()
         )
         embed.set_author(name="Pokedex", icon_url=URL_POKEDEX_ICON)
