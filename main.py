@@ -45,27 +45,21 @@ def request_pokemon_search(searched: str):
         websocket.send(f"|/dt {searched}")
         message = websocket.recv()
         return message
-def parse_pokemon_search(message: str):
+def parse_pokemon(message:str):
     m = [w for w in message.split("|pm|") if "pokemonnamecol" in w]
     html = m[0].split("/raw ")[1] # if websocket sends error, this will beak as there is nothing to split
-    soup = BeautifulSoup(html, features="html.parser")
-    return soup.a.string
-def parse_pokemon_type(message: str):
-    m = [w for w in message.split("|pm|") if "pokemonnamecol" in w]
-    html = m[0].split("/raw ")[1] # if websocket sends error, this will beak as there is nothing to split
-    soup = BeautifulSoup(html, features="html.parser")
-    return soup.a.string
-def pokemon_type(message: str) -> str:
-    m = [w for w in message.split("|pm|") if "pokemonnamecol" in w]
-    html = m[0].split("/raw ")[1] # if websocket sends error, this will beak as there is nothing to split
-    soup = BeautifulSoup(html, features="html.parser")
+    return BeautifulSoup(html, features="html.parser")
+def pokemon_type(soup: BeautifulSoup) -> str:
+    """
+    This function will parse the message from the websocket
+    it returns the type of the pokemon
+    """
     img = soup.find_all('img')
     res = "```ansi\n"
     for i in img:
         res += type_colors[i['alt']] + " "
     res += "```"
     return res
-    #return "```ansi\n\x1B[2;41m Feu \x1B[0m \x1B[2;45m Vol \x1B[0m```" #TODO: not placeholder
 
 @bot.event
 async def on_ready():
@@ -79,13 +73,14 @@ async def foo(ctx, arg):
 @bot.command()
 async def dex(ctx, arg):
     message = request_pokemon_search(arg)
-    search = parse_pokemon_search(message).lower()
+    soup = parse_pokemon(message)
+    search = soup.a.string.lower()
     response = requests.get(URL_POKEDEX, timeout=10)
     data = response.json()
     try:
         embed = discord.Embed(
             title=f"{data.get(search).get('num')}. {search.capitalize()}",
-            description= pokemon_type(message),
+            description= pokemon_type(soup),
             color=discord.Color.blue()
         )
         embed.set_author(name="Pokedex", icon_url=URL_POKEDEX_ICON)
