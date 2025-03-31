@@ -33,6 +33,8 @@ type_colors = {
     "Fairy": "\x1B[1;35m Fairy \x1B[0m"
 }
 
+pokedex_data = None
+
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -70,6 +72,13 @@ async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     logging.info(f'{bot.user} has connected to Discord!')
 
+    #get the pokedex data
+    response = requests.get(URL_POKEDEX, timeout=10)
+    global pokedex_data
+    pokedex_data = response.json()
+    print("Pokedex data loaded")
+    logging.info("Pokedex data loaded")
+
 @bot.command()
 async def foo(ctx, arg):
     await ctx.send(arg)
@@ -82,12 +91,9 @@ async def dex(ctx, arg):
     soup = parse_pokemon(message)
     #get the pokemon name
     search = soup.a.string.lower()
-    #get the pokedex data
-    response = requests.get(URL_POKEDEX, timeout=10) #maybe do that on startup and keep it in memory instead of doing it every time
-    data = response.json()
     try:
         embed = discord.Embed(
-            title=f"{data.get(search).get('num')}. {search.capitalize()}",
+            title=f"{pokedex_data.get(search).get('num')}. {search.capitalize()}",
             description= pokemon_type(soup),
             color=discord.Color.blue()
         )
