@@ -76,10 +76,14 @@ async def foo(ctx, arg):
 
 @bot.command()
 async def dex(ctx, arg):
+    #get the message from the websocket
     message = request_pokemon_search(arg)
+    #parse the message
     soup = parse_pokemon(message)
+    #get the pokemon name
     search = soup.a.string.lower()
-    response = requests.get(URL_POKEDEX, timeout=10)
+    #get the pokedex data
+    response = requests.get(URL_POKEDEX, timeout=10) #maybe do that on startup and keep it in memory instead of doing it every time
     data = response.json()
     try:
         embed = discord.Embed(
