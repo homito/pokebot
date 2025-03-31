@@ -39,6 +39,10 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 
 def request_pokemon_search(searched: str):
+    """
+    This function will send a message to the websocket
+    and return the response while ignoring the first two messages
+    """
     with connect(WEBSOCKET) as websocket:
         websocket.recv() # ignore |updateuser| message
         websocket.recv() # ignore |challstr| message (i should probably check what they are so its not hacked like that)
