@@ -80,10 +80,6 @@ async def on_ready():
     logging.info("Pokedex data loaded")
 
 @bot.command()
-async def foo(ctx, arg):
-    await ctx.send(arg)
-
-@bot.command()
 async def duel(ctx, arg):
     dueler = ctx.message.author.mention
     duelee = ctx.message.mentions[0].mention
