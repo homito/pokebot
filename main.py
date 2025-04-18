@@ -84,6 +84,25 @@ async def foo(ctx, arg):
     await ctx.send(arg)
 
 @bot.command()
+async def duel(ctx, arg):
+    dueler = ctx.message.author.mention
+    duelee = ctx.message.mentions[0].mention
+    await ctx.send(f"{dueler} wants to duel {duelee}")
+
+class Buttons(discord.ui.View):
+    def __init__(self, *, timeout=180):
+        super().__init__(timeout=timeout)
+    @discord.ui.button(label="Button",style=discord.ButtonStyle.gray)
+    async def gray_button(self,button:discord.ui.Button,interaction:discord.Interaction):
+        await interaction.response.edit_message(content=f"This is an edited button response!")
+
+@bot.command()
+async def button(ctx):
+    await ctx.send("This message has buttons!",view=Buttons())
+
+
+
+@bot.command()
 async def dex(ctx, arg):
     #get the message from the websocket
     message = request_pokemon_search(arg)
