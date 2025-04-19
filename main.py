@@ -35,6 +35,22 @@ TYPE_COLORS = {
 
 pokedex_data = None
 
+class Battle(discord.ui.view):
+    def __init__(self, timeout=60):
+        super().__init__(timeout=timeout)
+    @discord.ui.button(label="Move 1", style=discord.ButtonStyle.primary)
+    async def move1(self, interaction, button):
+        await interaction.response.send_message("You pressed me!")
+    @discord.ui.button(label="Move 2", style=discord.ButtonStyle.primary)
+    async def move2(self, interaction, button):
+        await interaction.response.send_message("You pressed me!")
+    @discord.ui.button(label="Move 3", style=discord.ButtonStyle.primary)
+    async def move3(self, interaction, button):
+        await interaction.response.send_message("You pressed me!")
+    @discord.ui.button(label="Move 4", style=discord.ButtonStyle.primary)
+    async def move4(self, interaction, button):
+        await interaction.response.send_message("You pressed me!")
+
 intents = discord.Intents.default()
 intents.message_content = True
 
