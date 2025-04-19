@@ -81,22 +81,25 @@ async def on_ready():
 
 @bot.command()
 async def duel(ctx, arg):
-    dueler = ctx.message.author.mention
-    duelee = ctx.message.mentions[0].mention
-    await ctx.send(f"{dueler} wants to duel {duelee}")
+    dueler = ctx.message.author
+    duelee = ctx.message.mentions[0]
+    await ctx.send(f"{dueler.mention} wants to duel {duelee.mention}", view=Duel(dueler=dueler, duelee=duelee, timeout=60))
 
-class Buttons(discord.ui.View):
-    def __init__(self, *, timeout=180):
+class Duel(discord.ui.View):
+    dueler = None
+    duelee = None
+    def __init__(self, dueler, duelee, timeout=60):
         super().__init__(timeout=timeout)
-    @discord.ui.button(label="Button",style=discord.ButtonStyle.gray)
-    async def gray_button(self,button:discord.ui.Button,interaction:discord.Interaction):
-        await interaction.response.edit_message(content=f"This is an edited button response!")
-
-@bot.command()
-async def button(ctx):
-    await ctx.send("This message has buttons!",view=Buttons())
-
-
+        self.dueler = dueler
+        self.duelee = duelee
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.primary)
+    async def accept(self, interaction, button):
+        if interaction.user == self.duelee:
+            await interaction.response.send_message("You pressed me!")
+    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger)
+    async def decline(self, interaction, button):
+        if interaction.user == self.duelee:
+            await interaction.response.send_message(f"{self.duelee} declined the duel")
 
 @bot.command()
 async def dex(ctx, arg):
