@@ -1,8 +1,8 @@
 import logging
 import json
-import requests
 from argparse import ArgumentParser
 from websockets.sync.client import connect
+import requests
 import discord
 from discord.ext import commands
 from bs4 import BeautifulSoup
@@ -12,7 +12,7 @@ URL_POKEDEX_ICON = "https://archives.bulbagarden.net/media/upload/thumb/6/61/DP_
 URL_SPRITE = "https://play.pokemonshowdown.com/sprites"
 WEBSOCKET = "wss://sim3.psim.us/showdown/websocket"
 
-type_colors = {
+TYPE_COLORS = {
     "Normal": "\x1B[1;47;30m Normal \x1B[0m",
     "Fighting": "\x1B[1;41m Fighting \x1B[0m",
     "Flying": "\x1B[1;45m Flying \x1B[0m",
@@ -63,7 +63,7 @@ def pokemon_type(soup: BeautifulSoup) -> str:
     img = soup.find_all('img')
     res = "```ansi\n"
     for i in img:
-        res += type_colors[i['alt']] + " "
+        res += TYPE_COLORS[i['alt']] + " "
     res += "```"
     return res
 
@@ -83,9 +83,9 @@ async def on_ready():
 async def duel(ctx, arg):
     dueler = ctx.message.author
     duelee = ctx.message.mentions[0]
-    await ctx.send(f"{dueler.mention} wants to duel {duelee.mention}", view=Duel(dueler=dueler, duelee=duelee, timeout=60))
+    await ctx.send(f"{dueler.mention} wants to duel {duelee.mention}", view=DuelRequest(dueler=dueler, duelee=duelee, timeout=60))
 
-class Duel(discord.ui.View):
+class DuelRequest(discord.ui.View):
     dueler = None
     duelee = None
     def __init__(self, dueler, duelee, timeout=60):
