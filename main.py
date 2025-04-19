@@ -90,7 +90,6 @@ class Websocket():
         updateuser = await self.websocket.recv()
         challstr = await self.websocket.recv()        
         self.challstr = challstr.split("|challstr|")[1]
-        print("connected with challstr:", self.challstr)
     async def login(self):
         data = {
             "act": "getassertion",
@@ -105,8 +104,8 @@ class Websocket():
         res = requests.post(ACTION_URL, data=data)
         if res.status_code != 200:
             print("Login failed")
+            logging.error("Login failed")
             return
-        print("Login success")
         if self.password is None:
             assertion = res.text
         else:
@@ -114,11 +113,9 @@ class Websocket():
         change_name = f"|/trn {self.username},0,{assertion}"
         await self.websocket.send(change_name)
         response = await self.websocket.recv()
-        print(response)
     async def challenge(self, opponent, battleformat):
         await self.websocket.send(f"|/challenge {opponent}, {battleformat}")
         response = await self.websocket.recv()
-        print(response)
     async def request_pokemon_search(self, searched: str):
         """
         This function will send a message to the websocket
@@ -126,7 +123,6 @@ class Websocket():
         """
         await self.websocket.send(f"|/dt {searched}")
         message = await self.websocket.recv()
-        print(message)
         return message
 
 ws = None
