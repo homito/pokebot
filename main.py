@@ -51,6 +51,23 @@ class Battle(discord.ui.View):
     async def move4(self, interaction, button):
         await interaction.response.send_message("You pressed me!")
 
+class DuelRequest(discord.ui.View):
+    dueler = None
+    duelee = None
+    def __init__(self, dueler, duelee, timeout=60):
+        super().__init__(timeout=timeout)
+        self.dueler = dueler
+        self.duelee = duelee
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.primary)
+    async def accept(self, interaction, button):
+        if interaction.user == self.duelee:
+            await interaction.response.send_message("You pressed me!")
+    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger)
+    async def decline(self, interaction, button):
+        if interaction.user == self.duelee:
+            await interaction.response.send_message(f"{self.duelee} declined the duel")
+
+
 intents = discord.Intents.default()
 intents.message_content = True
 
