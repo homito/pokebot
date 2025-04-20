@@ -180,9 +180,10 @@ async def dex(ctx, arg):
         #parse the message
         soup = parse_pokemon(message)
         #get the pokemon name
-        search = soup.a.string.lower()
+        name = soup.a.string.lower()
+        search = name.replace(" ", "")
         embed = discord.Embed(
-            title=f"{pokedex_data.get(search).get('num')}. {search.capitalize()}",
+            title=f"{pokedex_data.get(search).get('num')}. {name.title()}",
             description= pokemon_type(soup),
             color=discord.Color.blue()
         )
