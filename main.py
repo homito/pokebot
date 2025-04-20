@@ -88,7 +88,7 @@ class Websocket():
         return self
     async def connect(self):
         updateuser = await self.websocket.recv()
-        challstr = await self.websocket.recv()        
+        challstr = await self.websocket.recv()
         self.challstr = challstr.split("|challstr|")[1]
     async def login(self):
         data = {
@@ -162,7 +162,7 @@ async def on_ready():
 
     #create the websocket connection
     global ws
-    ws = await Websocket.create("homiboot")
+    ws = await Websocket.create("pokebotdiscord")
     print("Websocket connection created")
     logging.info("Websocket connection created")
 
