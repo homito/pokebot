@@ -176,11 +176,11 @@ async def duel(ctx, arg):
 async def dex(ctx, arg):
     #get the message from the websocket
     message = await ws.request_pokemon_search(arg)
-    #parse the message
-    soup = parse_pokemon(message)
-    #get the pokemon name
-    search = soup.a.string.lower()
     try:
+        #parse the message
+        soup = parse_pokemon(message)
+        #get the pokemon name
+        search = soup.a.string.lower()
         embed = discord.Embed(
             title=f"{pokedex_data.get(search).get('num')}. {search.capitalize()}",
             description= pokemon_type(soup),
@@ -192,9 +192,10 @@ async def dex(ctx, arg):
             embed.set_thumbnail(url=f"{URL_SPRITE}/bwani/{search}.gif")
         else:
             embed.set_thumbnail(url=f"{URL_SPRITE}/xyani/{search}.gif")
-        await ctx.send(embed=embed)
-    except AttributeError:
-        await ctx.send("Pokemon not found")
+        await ctx.reply(embed=embed)
+    except Exception as e:
+        logging.error(f"Error: {e}")
+        await ctx.reply("Pokemon not found")
 
 
 if __name__ == "__main__":
