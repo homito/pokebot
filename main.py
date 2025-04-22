@@ -1,48 +1,15 @@
-import logging
 import json
 from argparse import ArgumentParser
+
 import requests
 import discord
 from discord.ext import commands
-from bs4 import BeautifulSoup
 
 from websocket import Websocket
-from constants import *
+from constants import URL_POKEDEX, URL_POKEDEX_ICON, URL_SPRITE
 from logger import Logger
-
-
-
-class Battle(discord.ui.View):
-    def __init__(self, timeout=60):
-        super().__init__(timeout=timeout)
-    @discord.ui.button(label="Move 1", row=0, style=discord.ButtonStyle.primary)
-    async def move1(self, interaction, button):
-        await interaction.response.send_message("You pressed me!")
-    @discord.ui.button(label="Move 2", row=0, style=discord.ButtonStyle.primary)
-    async def move2(self, interaction, button):
-        await interaction.response.send_message("You pressed me!")
-    @discord.ui.button(label="Move 3", row=1, style=discord.ButtonStyle.primary)
-    async def move3(self, interaction, button):
-        await interaction.response.send_message("You pressed me!")
-    @discord.ui.button(label="Move 4", row=1, style=discord.ButtonStyle.primary)
-    async def move4(self, interaction, button):
-        await interaction.response.send_message("You pressed me!")
-
-class DuelRequest(discord.ui.View):
-    dueler = None
-    duelee = None
-    def __init__(self, dueler, duelee, timeout=60):
-        super().__init__(timeout=timeout)
-        self.dueler = dueler
-        self.duelee = duelee
-    @discord.ui.button(label="Accept", style=discord.ButtonStyle.primary)
-    async def accept(self, interaction, button):
-        if interaction.user == self.duelee:
-            await interaction.response.send_message("You pressed me!")
-    @discord.ui.button(label="Decline", style=discord.ButtonStyle.danger)
-    async def decline(self, interaction, button):
-        if interaction.user == self.duelee:
-            await interaction.response.send_message(f"{self.duelee} declined the duel")
+from utils import parse_pokemon, pokemon_type, navigation_callback
+from buttons import DuelRequest, Battle, NavigationView
 
 class MyBot(commands.Bot):
     def __init__(self, *args, **kwargs):
@@ -91,6 +58,7 @@ async def dex(ctx, arg):
         soup = parse_pokemon(message)
         #get the pokemon name
         name = soup.a.string.lower()
+        number = bot.pokedex_data.get(name).get("num")
         search = name.replace(" ", "")
         embed = discord.Embed(
             title=f"{bot.pokedex_data.get(search).get('num')}. {name.title()}",
@@ -103,7 +71,7 @@ async def dex(ctx, arg):
             embed.set_thumbnail(url=f"{URL_SPRITE}/bwani/{search}.gif")
         else:
             embed.set_thumbnail(url=f"{URL_SPRITE}/xyani/{search}.gif")
-        await ctx.reply(embed=embed)
+        await ctx.reply(embed=embed, view=NavigationView(author=ctx.message.author, callback=dex, arguments=[ctx, number]))
     except Exception as e:
         bot.log.errorlog(e)
         await ctx.reply("Pokemon not found")

@@ -66,5 +66,5 @@ class Websocket():
         await self.websocket.send(f"|/challenge {opponent}, {battleformat}")
         response = await self.websocket.recv()
 
-    async def request_pokemon_search(self, searched: str):
-        return await self.request("|/dt " + searched)
+    async def request_pokemon_search(self, searched):
+        return await self.request("|/dt " + str(searched))
