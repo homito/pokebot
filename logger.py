@@ -25,7 +25,7 @@ class Logger:
         return self.log
 
     def get_handler(self):
-        return self.log.handlers[0]
+        return self.log.handlers[1]
 
     def infolog(self, msg: str):
         self.log.info(msg)
