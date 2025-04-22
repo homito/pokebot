@@ -2,8 +2,6 @@ import logging
 
 class Logger:
     def __init__(self, config:dict):
-
-        print ("logger name ",__name__)
         self.__level___ = config["log_level"] 
 
         formatter = logging.Formatter(config["log_format"])

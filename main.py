@@ -58,25 +58,8 @@ intents.message_content = True
 
 bot = MyBot(command_prefix='!', intents=discord.Intents.all())
 
-def parse_pokemon(message:str):
-    m = [w for w in message.split("|pm|") if "pokemonnamecol" in w]
-    html = m[0].split("/raw ")[1] # if websocket sends error, this will beak as there is nothing to split
-    return BeautifulSoup(html, features="html.parser")
-def pokemon_type(soup: BeautifulSoup) -> str:
-    """
-    This function will parse the message from the websocket
-    it returns the type of the pokemon
-    """
-    img = soup.find_all('img')
-    res = "```ansi\n"
-    for i in img:
-        res += TYPE_COLORS[i['alt']] + " "
-    res += "```"
-    return res
-
 @bot.event
 async def on_ready():
-    print(f'{bot.user} has connected to Discord!')
     bot.log.infolog(f'{bot.user} has connected to Discord!')
 
     #get the pokedex data
@@ -85,7 +68,7 @@ async def on_ready():
     bot.log.infolog("Pokedex data loaded")
 
     #create the websocket connection
-    bot.showdown_ws = await Websocket.create("pokebotdiscord")
+    bot.showdown_ws = await Websocket.create(logger=bot.log, username="pokebotdiscord123")
     bot.log.infolog("Websocket connection created")
 
 @bot.command()
@@ -117,7 +100,7 @@ async def dex(ctx, arg):
             embed.set_thumbnail(url=f"{URL_SPRITE}/xyani/{search}.gif")
         await ctx.reply(embed=embed)
     except Exception as e:
-        bot.log.errorlog(f"Error: {e}")
+        bot.log.errorlog(e)
         await ctx.reply("Pokemon not found")
 
 
