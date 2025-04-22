@@ -22,7 +22,7 @@ class Logger:
         self.log.addHandler(f_handler)
 
     def get_logger(self):
-        return self.log
+        return self
 
     def get_handler(self):
         return self.log.handlers[1]

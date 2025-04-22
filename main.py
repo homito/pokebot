@@ -44,13 +44,19 @@ class DuelRequest(discord.ui.View):
         if interaction.user == self.duelee:
             await interaction.response.send_message(f"{self.duelee} declined the duel")
 
+class MyBot(commands.Bot):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def set_logger(self, logger):
+        self.log = logger
 
 ws = None
 
 intents = discord.Intents.default()
 intents.message_content = True
 
-bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+bot = MyBot(command_prefix='!', intents=discord.Intents.all())
 
 def parse_pokemon(message:str):
     m = [w for w in message.split("|pm|") if "pokemonnamecol" in w]
@@ -71,20 +77,18 @@ def pokemon_type(soup: BeautifulSoup) -> str:
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
-    logging.info(f'{bot.user} has connected to Discord!')
+    bot.log.infolog(f'{bot.user} has connected to Discord!')
 
     #get the pokedex data
     response = requests.get(URL_POKEDEX, timeout=10)
     global pokedex_data
     pokedex_data = response.json()
-    print("Pokedex data loaded")
-    logging.info("Pokedex data loaded")
+    bot.log.infolog("Pokedex data loaded")
 
     #create the websocket connection
     global ws
     ws = await Websocket.create("pokebotdiscord")
-    print("Websocket connection created")
-    logging.info("Websocket connection created")
+    bot.log.infolog("Websocket connection created")
 
 @bot.command()
 async def duel(ctx, arg):
@@ -128,4 +132,5 @@ if __name__ == "__main__":
 
     config = json.load(open(args.config))
     logger = Logger(config["log_config"])
+    bot.set_logger(logger.get_logger())
     bot.run(config["token"], log_handler=logger.get_handler(), log_level=config["log_config"]["log_level"])
