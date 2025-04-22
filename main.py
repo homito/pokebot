@@ -8,7 +8,7 @@ from discord.ext import commands
 from websocket import Websocket
 from constants import URL_POKEDEX, URL_POKEDEX_ICON, URL_SPRITE
 from logger import Logger
-from utils import parse_pokemon, pokemon_type, navigation_callback
+from utils import parse_pokemon, pokemon_type
 from buttons import DuelRequest, Battle, NavigationView
 
 class MyBot(commands.Bot):
@@ -51,27 +51,43 @@ async def duel(ctx, arg):
 
 @bot.command()
 async def dex(ctx, arg):
-    #get the message from the websocket
-    message = await bot.showdown_ws.request_pokemon_search(arg)
+    async def parse_argument(bot, arg)->discord.Embed:
+        try:
+            message = await bot.showdown_ws.request_pokemon_search(arg)
+            soup = parse_pokemon(message)
+            name = soup.a.string.lower()
+            number = bot.pokedex_data.get(name).get("num")
+            search = name.replace(" ", "")
+            embed = discord.Embed(
+                title=f"{bot.pokedex_data.get(search).get('num')}. {name.title()}",
+                description= pokemon_type(soup),
+                color=discord.Color.blue()
+            )
+            embed.set_author(name="Pokedex", icon_url=URL_POKEDEX_ICON)
+            res = requests.get(f"{URL_SPRITE}/xyani/{search}.gif", timeout=10)
+            if res.status_code == requests.codes.NOT_FOUND:
+                embed.set_thumbnail(url=f"{URL_SPRITE}/bwani/{search}.gif")
+            else:
+                embed.set_thumbnail(url=f"{URL_SPRITE}/xyani/{search}.gif")
+            return embed
+        except Exception as e:
+            raise e
+
+    async def edit_dex(o_msg, msg, arg):
+        try:
+            embed = await parse_argument(bot, arg)
+            number = int(embed.title.split(".")[0].strip())
+            await msg.delete()
+            msg = await o_msg.reply(embed=embed)
+            await msg.edit(view=NavigationView(author=o_msg.author, callback=edit_dex, arguments=[o_msg, msg, number]))
+        except Exception as e:
+            bot.log.errorlog(e)
+            
     try:
-        #parse the message
-        soup = parse_pokemon(message)
-        #get the pokemon name
-        name = soup.a.string.lower()
-        number = bot.pokedex_data.get(name).get("num")
-        search = name.replace(" ", "")
-        embed = discord.Embed(
-            title=f"{bot.pokedex_data.get(search).get('num')}. {name.title()}",
-            description= pokemon_type(soup),
-            color=discord.Color.blue()
-        )
-        embed.set_author(name="Pokedex", icon_url=URL_POKEDEX_ICON)
-        res = requests.get(f"{URL_SPRITE}/xyani/{search}.gif", timeout=10)
-        if res.status_code == requests.codes.NOT_FOUND:
-            embed.set_thumbnail(url=f"{URL_SPRITE}/bwani/{search}.gif")
-        else:
-            embed.set_thumbnail(url=f"{URL_SPRITE}/xyani/{search}.gif")
-        await ctx.reply(embed=embed, view=NavigationView(author=ctx.message.author, callback=dex, arguments=[ctx, number]))
+        embed = await parse_argument(bot, arg)
+        number = int(embed.title.split(".")[0].strip())
+        message = await ctx.reply(embed=embed)
+        await message.edit(view=NavigationView(author=ctx.message.author, callback=edit_dex, arguments=[ctx, message, number]))
     except Exception as e:
         bot.log.errorlog(e)
         await ctx.reply("Pokemon not found")

@@ -42,8 +42,8 @@ class NavigationView(discord.ui.View):
     @discord.ui.button(label="Previous", style=discord.ButtonStyle.primary)
     async def previous(self, interaction, button):
         if interaction.user == self.author:
-            await self.callback(self.arguments[0], self.arguments[1]-1)
+            await self.callback(self.arguments[0], self.arguments[1], self.arguments[2]-1)
     @discord.ui.button(label="Next", style=discord.ButtonStyle.primary)
     async def next(self, interaction, button):
         if interaction.user == self.author:
-            await self.callback(self.arguments[0], self.arguments[1]+1)
+            await self.callback(self.arguments[0], self.arguments[1], self.arguments[2]+1)
