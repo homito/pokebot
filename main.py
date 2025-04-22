@@ -10,7 +10,7 @@ from websocket import Websocket
 from constants import *
 from logger import Logger
 
-pokedex_data = None
+
 
 class Battle(discord.ui.View):
     def __init__(self, timeout=60):
@@ -47,11 +47,11 @@ class DuelRequest(discord.ui.View):
 class MyBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.pokedex_data = None
+        self.showdown_ws = None
 
     def set_logger(self, logger):
         self.log = logger
-
-ws = None
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -81,13 +81,11 @@ async def on_ready():
 
     #get the pokedex data
     response = requests.get(URL_POKEDEX, timeout=10)
-    global pokedex_data
-    pokedex_data = response.json()
+    bot.pokedex_data = response.json()
     bot.log.infolog("Pokedex data loaded")
 
     #create the websocket connection
-    global ws
-    ws = await Websocket.create("pokebotdiscord")
+    bot.showdown_ws = await Websocket.create("pokebotdiscord")
     bot.log.infolog("Websocket connection created")
 
 @bot.command()
@@ -99,7 +97,7 @@ async def duel(ctx, arg):
 @bot.command()
 async def dex(ctx, arg):
     #get the message from the websocket
-    message = await ws.request_pokemon_search(arg)
+    message = await bot.showdown_ws.request_pokemon_search(arg)
     try:
         #parse the message
         soup = parse_pokemon(message)
@@ -107,7 +105,7 @@ async def dex(ctx, arg):
         name = soup.a.string.lower()
         search = name.replace(" ", "")
         embed = discord.Embed(
-            title=f"{pokedex_data.get(search).get('num')}. {name.title()}",
+            title=f"{bot.pokedex_data.get(search).get('num')}. {name.title()}",
             description= pokemon_type(soup),
             color=discord.Color.blue()
         )
