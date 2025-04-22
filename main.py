@@ -117,7 +117,7 @@ async def dex(ctx, arg):
             embed.set_thumbnail(url=f"{URL_SPRITE}/xyani/{search}.gif")
         await ctx.reply(embed=embed)
     except Exception as e:
-        logging.error(f"Error: {e}")
+        bot.log.errorlog(f"Error: {e}")
         await ctx.reply("Pokemon not found")
 
 
