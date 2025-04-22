@@ -9,7 +9,7 @@ from websocket import Websocket
 from constants import URL_POKEDEX, URL_POKEDEX_ICON, URL_SPRITE
 from logger import Logger
 from utils import parse_pokemon, pokemon_type
-from buttons import DuelRequest, Battle, NavigationView
+from buttons import NavigationView
 
 class MyBot(commands.Bot):
     def __init__(self, *args, **kwargs):
@@ -43,11 +43,9 @@ async def on_ready():
     bot.showdown_ws = await Websocket.create(logger=bot.log, username=bot.username, password=bot.password)
     bot.log.infolog("Websocket connection created")
 
-@bot.command()
-async def duel(ctx, arg):
-    dueler = ctx.message.author
-    duelee = ctx.message.mentions[0]
-    await ctx.send(f"{dueler.mention} wants to duel {duelee.mention}", view=DuelRequest(dueler=dueler, duelee=duelee, timeout=60))
+@bot.coomand()
+async def ping(ctx):
+    await ctx.reply("Pong!")
 
 @bot.command()
 async def dex(ctx, arg):
