@@ -5,11 +5,11 @@ from constants import *
 
 class Websocket():
     @classmethod
-    async def create(cls, username, password=None):
+    async def create(cls, logger, username, password=None):
         self = Websocket()
         self.username = username
         self.password = password
-        self.log_path = None # jsp a quel point c important on triera plus tard
+        self.log = logger
         self.challstr = ""
         self.battle_id = ""
         self.player = ""
@@ -17,7 +17,7 @@ class Websocket():
         self.websocket = await websockets.connect(WEBSOCKET)
         await self.connect()
         await self.login()
-        message = await self.websocket.recv() #updateuser (jsp exactement ce que c)
+        message = await self.websocket.recv() #updateuser
         message = await self.websocket.recv() #updatesearch
         #await self.challenge("homiboot", "gen9randombattle")
         return self
@@ -26,6 +26,7 @@ class Websocket():
         updateuser = await self.websocket.recv()
         challstr = await self.websocket.recv()
         self.challstr = challstr.split("|challstr|")[1]
+        self.log.infolog(f"connected with challstr: {self.challstr}")
 
     async def login(self):
         data = {
@@ -41,7 +42,7 @@ class Websocket():
         res = requests.post(ACTION_URL, data=data)
         if res.status_code != 200:
             print("Login failed")
-            logging.error("Login failed")
+            self.log.errorlog("Login failed")
             return
         if self.password is None:
             assertion = res.text
@@ -50,6 +51,7 @@ class Websocket():
         change_name = f"|/trn {self.username},0,{assertion}"
         await self.websocket.send(change_name)
         response = await self.websocket.recv()
+        self.log.infolog("Logged in successfully")
 
     async def challenge(self, opponent, battleformat):
         await self.websocket.send(f"|/challenge {opponent}, {battleformat}")
