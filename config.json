@@ -5,5 +5,9 @@
       "log_level":"DEBUG",
       "log_format":"%(asctime)s - %(message)s",
       "log_file":"logs/testlog.txt"
+    },
+    "showdown_account":{
+        "username":"tp3python",
+        "password":"verysecurepassword"
     }
 }

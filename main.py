@@ -49,9 +49,14 @@ class MyBot(commands.Bot):
         super().__init__(*args, **kwargs)
         self.pokedex_data = None
         self.showdown_ws = None
+        self.username = None
+        self.password = None
 
     def set_logger(self, logger):
         self.log = logger
+    def set_showdown_account(self, username, password):
+        self.username = username
+        self.password = password
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -68,7 +73,7 @@ async def on_ready():
     bot.log.infolog("Pokedex data loaded")
 
     #create the websocket connection
-    bot.showdown_ws = await Websocket.create(logger=bot.log, username="pokebotdiscord123")
+    bot.showdown_ws = await Websocket.create(logger=bot.log, username=bot.username, password=bot.password)
     bot.log.infolog("Websocket connection created")
 
 @bot.command()
@@ -114,4 +119,5 @@ if __name__ == "__main__":
     config = json.load(open(args.config))
     logger = Logger(config["log_config"])
     bot.set_logger(logger.get_logger())
+    bot.set_showdown_account(config["showdown_account"]["username"], config["showdown_account"]["password"])
     bot.run(config["token"], log_handler=logger.get_handler(), log_level=config["log_config"]["log_level"])
