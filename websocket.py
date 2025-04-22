@@ -53,15 +53,18 @@ class Websocket():
         response = await self.websocket.recv()
         self.log.infolog("Logged in successfully")
 
+    async def request(self, message: str):
+        """
+        This function will send a message to the websocket
+        and return the response
+        """
+        await self.websocket.send(message)
+        response = await self.websocket.recv()
+        return response
+
     async def challenge(self, opponent, battleformat):
         await self.websocket.send(f"|/challenge {opponent}, {battleformat}")
         response = await self.websocket.recv()
 
     async def request_pokemon_search(self, searched: str):
-        """
-        This function will send a message to the websocket
-        and return the response
-        """
-        await self.websocket.send(f"|/dt {searched}")
-        message = await self.websocket.recv()
-        return message
+        return await self.request("|/dt " + searched)
