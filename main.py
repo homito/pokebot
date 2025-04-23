@@ -43,7 +43,7 @@ async def on_ready():
     bot.showdown_ws = await Websocket.create(logger=bot.log, username=bot.username, password=bot.password)
     bot.log.infolog("Websocket connection created")
 
-@bot.coomand()
+@bot.command()
 async def ping(ctx):
     await ctx.reply("Pong!")
 
