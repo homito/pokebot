@@ -54,8 +54,8 @@ async def dex(ctx, arg):
             message = await bot.showdown_ws.request_pokemon_search(arg)
             soup = parse_pokemon(message)
             name = soup.a.string.lower()
-            number = bot.pokedex_data.get(name).get("num")
-            search = name.replace(" ", "")
+            search = name.replace(" ", "").replace("-", "").replace("'", "").replace(".", "").replace(",", "").replace("!", "").replace("?", "")
+            number = bot.pokedex_data.get(search).get("num")
             embed = discord.Embed(
                 title=f"{number}. {name.title()}",
                 description= pokemon_type(soup),
