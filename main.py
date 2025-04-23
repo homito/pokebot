@@ -1,3 +1,8 @@
+"""
+Main file for the Discord bot that interacts with the Pokemon Showdown API.
+This bot allows users to search for Pokemon information using the Pokedex API and the Showdown WebSocket API.
+"""
+
 import json
 from argparse import ArgumentParser
 
@@ -50,6 +55,10 @@ async def ping(ctx):
 @bot.command()
 async def dex(ctx, arg):
     async def parse_argument(bot, arg)->discord.Embed:
+        """
+        Parses the argument given by the user
+        returns a discord embed with the pokemon information.
+        """
         try:
             message = await bot.showdown_ws.request_pokemon_search(arg)
             soup = parse_pokemon(message)
@@ -62,9 +71,9 @@ async def dex(ctx, arg):
                 color=discord.Color.blue()
             )
             embed.set_author(name="Pokedex", icon_url=URL_POKEDEX_ICON)
-            res = requests.get(f"{URL_SPRITE}/xyani/{search}.gif", timeout=10)
+            res = requests.get(f"{URL_SPRITE}/xyani/{search}.gif", timeout=10) #3d sprite gif
             if res.status_code == requests.codes.NOT_FOUND:
-                embed.set_thumbnail(url=f"{URL_SPRITE}/bwani/{search}.gif")
+                embed.set_thumbnail(url=f"{URL_SPRITE}/bwani/{search}.gif") #2d sprite gif
             else:
                 embed.set_thumbnail(url=f"{URL_SPRITE}/xyani/{search}.gif")
             return embed
@@ -72,6 +81,10 @@ async def dex(ctx, arg):
             raise e
 
     async def edit_dex(o_msg, msg, arg):
+        """
+        This function will be called when the user clicks on the buttons
+        It deletes the old message and replace it with a new one with the correct informations
+        """
         try:
             embed = await parse_argument(bot, arg)
             number = int(embed.title.split(".")[0].strip())

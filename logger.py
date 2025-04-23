@@ -1,6 +1,14 @@
+"""
+Contains the Logger class for logging messages to console and file.
+imported from Moodle.
+"""
+
 import logging
 
 class Logger:
+    """
+    A simple logger class that handles logging messages to both console and file.
+    """
     def __init__(self, config:dict):
         self.__level___ = config["log_level"] 
 

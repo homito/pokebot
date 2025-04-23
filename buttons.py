@@ -1,7 +1,15 @@
+"""
+Contains the Views that are used for the buttons in the bot.
+"""
+
 import discord
 from discord.ext import commands
 
 class NavigationView(discord.ui.View):
+    """
+    A view that contains buttons for navigating through a paginated message.
+    The buttons only work for the author of the message being replied to.
+    """
     def __init__(self, author, callback, arguments, timeout=60):
         super().__init__(timeout=timeout)
         self.author = author

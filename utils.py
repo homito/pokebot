@@ -1,9 +1,17 @@
+"""
+Contains the utility functions for the bot.
+"""
+
 from bs4 import BeautifulSoup
 from constants import TYPE_COLORS
 
 def parse_pokemon(message:str):
+    """
+    This function will parse the message from the websocket
+    it returns the soup object of the pokemon
+    """
     m = [w for w in message.split("|pm|") if "pokemonnamecol" in w]
-    html = m[0].split("/raw ")[1] # if websocket sends error, this will beak as there is nothing to split
+    html = m[0].split("/raw ")[1]
     return BeautifulSoup(html, features="html.parser")
 
 def pokemon_type(soup: BeautifulSoup) -> str:
