@@ -99,6 +99,9 @@ async def dex(ctx, arg):
         number = int(embed.title.split(".")[0].strip())
         message = await ctx.reply(embed=embed)
         await message.edit(view=NavigationView(author=ctx.message.author, callback=edit_dex, arguments=[ctx, message, number]))
+    except IndexError:
+        bot.log.errorlog("invalid pokemon name input")
+        await ctx.reply("Pokemon not found")
     except Exception as e:
         bot.log.errorlog(e)
         await ctx.reply("Pokemon not found")
